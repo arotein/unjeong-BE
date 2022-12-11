@@ -1,0 +1,40 @@
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enable: true
+      force: true
+  shutdown: graceful
+  port: 12230
+
+spring:
+  profiles:
+    active: ${PROFILE}
+  jpa:
+    hibernate.ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        query.in_clause_parameter_padding: true
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST_PORT}/unjeong?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
+
+logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
+  level:
+    root: info
+
+global:
+  api:
+    base-path: /api/customer
