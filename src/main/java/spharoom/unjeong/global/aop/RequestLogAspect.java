@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 @RequiredArgsConstructor
 public class RequestLogAspect {
-    @Around("execution(* spharoom.unjeong.customer..*Controller.*(..))")
+    @Around("execution(* spharoom.unjeong.appointment..*Controller.*(..))")
     public Object requestControllerLog(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         Object target = joinPoint.getTarget();
