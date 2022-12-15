@@ -35,14 +35,14 @@ public class RequestAppointmentReqDto {
                 .phone(phone)
                 .appointmentType(appointmentType)
                 .numberOfPeople(numberOfPeople)
-                .appointmentDateTime(appointmentDate.atStartOfDay().plusHours(appointmentHour))
+                .appointmentDate(appointmentDate)
+                .appointmentTime(LocalTime.of(appointmentHour, 0))
                 .build();
     }
 
     public void validationCheck() {
         LocalDate nowDate = LocalDate.now();
         LocalDate nextWeekDate = nowDate.plusDays(7);
-
         LocalTime nowTime = LocalTime.now();
 
         if (!name.matches("^[가-힣]+$")) {
@@ -67,7 +67,7 @@ public class RequestAppointmentReqDto {
             throw new CommonException(12, "지난 시간은 예약할 수 없습니다.");
         }
         if (appointmentHour == nowTime.getHour()) {
-            throw new CommonException(13, "1시간 후부터 예약 가능합니다.");
+            throw new CommonException(13, String.format("%d시부터 예약 가능합니다.", nowTime.getHour() + 1));
         }
     }
 }
