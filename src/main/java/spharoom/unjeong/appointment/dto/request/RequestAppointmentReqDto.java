@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import spharoom.unjeong.appointment.domain.entity.Appointment;
+import spharoom.unjeong.appointment.domain.entity.Customer;
 import spharoom.unjeong.global.common.CommonException;
 import spharoom.unjeong.global.enumeration.AppointmentType;
 
@@ -19,28 +21,41 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestAppointmentReqDto {
+    @NotNull
     private String name;
+    @NotNull
     private String phone;
     @NotNull
     private AppointmentType appointmentType;
+    @NotNull
     private Integer numberOfPeople;
+    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate appointmentDate;
+    @NotNull
     private Integer appointmentHour;
 
-    public Appointment toEntity() {
-        validationCheck();
+    public Appointment toAppointmentEntity(Customer customer) {
+        if (customer == null) {
+            throw new CommonException(14, "Customer는 필수값입니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         return Appointment.builder()
-                .name(name)
-                .phone(phone)
                 .appointmentType(appointmentType)
                 .numberOfPeople(numberOfPeople)
                 .appointmentDate(appointmentDate)
                 .appointmentTime(LocalTime.of(appointmentHour, 0))
+                .build()
+                .linkToCustomer(customer);
+    }
+
+    public Customer toCustomerEntity() {
+        return Customer.builder()
+                .name(name)
+                .phone(phone)
                 .build();
     }
 
-    public void validationCheck() {
+    public RequestAppointmentReqDto checkValidation() {
         LocalDate nowDate = LocalDate.now();
         LocalDate nextWeekDate = nowDate.plusDays(7);
         LocalTime nowTime = LocalTime.now();
@@ -63,11 +78,12 @@ public class RequestAppointmentReqDto {
         if (appointmentHour < 11 || appointmentHour > 19) {
             throw new CommonException(11, "예약 가능 시간은 11~19시입니다.");
         }
-        if (appointmentHour < nowTime.getHour()) {
+        if (appointmentDate.isEqual(nowDate) && appointmentHour < nowTime.getHour()) {
             throw new CommonException(12, "지난 시간은 예약할 수 없습니다.");
         }
-        if (appointmentHour == nowTime.getHour()) {
-            throw new CommonException(13, String.format("%d시부터 예약 가능합니다.", nowTime.getHour() + 1));
+        if (appointmentDate.isEqual(nowDate) && appointmentHour == nowTime.getHour()) {
+            throw new CommonException(13, String.format("%d시 이후 시간만 예약 가능합니다.", nowTime.getHour() + 1));
         }
+        return this;
     }
 }

@@ -13,7 +13,7 @@ import spharoom.unjeong.global.common.CommonResponse;
 
 @Slf4j
 @RestControllerAdvice
-public class ExceptionControllerAdvice {
+public class ExceptionControllerAdvice { // 0~
 //    @ExceptionHandler
 //    public ResponseEntity runtimeExHandle(RuntimeException ex) {
 //        log.error("Exception Name = {}, Code = 1, Message = {}", ex.getClass().getName(), ex.getMessage());

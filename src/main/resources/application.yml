@@ -8,13 +8,9 @@ server:
   port: 12230
 
 spring:
-  profiles:
-    active: ${PROFILE}
   jpa:
-    hibernate.ddl-auto: update
     properties:
       hibernate:
-        format_sql: true
         query.in_clause_parameter_padding: true
     database: mysql
     database-platform: org.hibernate.dialect.MySQL8Dialect
@@ -37,4 +33,15 @@ logging:
 
 global:
   api:
-    base-path: /api/customer
+    customer-base-path: /api/customer
+    admin-base-path: /api/admin
+---
+
+spring:
+  profiles:
+    active: dev
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
