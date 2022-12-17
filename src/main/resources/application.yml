@@ -8,6 +8,8 @@ server:
   port: 12230
 
 spring:
+  profiles:
+    active: ${PROFILE}
   jpa:
     properties:
       hibernate:
@@ -38,8 +40,9 @@ global:
 ---
 
 spring:
-  profiles:
-    active: dev
+  config:
+    activate:
+      on-profile: dev
   jpa:
     properties:
       hibernate:
