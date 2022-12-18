@@ -49,8 +49,6 @@ public class Appointment extends BaseEntity { // 200 ~
     @Comment("예약등록시간")
     @Builder.Default
     private LocalDateTime requestDateTime = LocalDateTime.now();
-    @Comment("예약메모")
-    private String description; // 관리자용
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;

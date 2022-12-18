@@ -10,6 +10,9 @@ server:
 spring:
   profiles:
     active: ${PROFILE}
+  batch:
+    job.enabled: true # true: 앱 구동시 job 실행 함
+    jdbc.initialize-schema: never
   jpa:
     properties:
       hibernate:
