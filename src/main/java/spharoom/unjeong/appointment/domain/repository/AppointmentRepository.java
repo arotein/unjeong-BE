@@ -6,8 +6,11 @@ import spharoom.unjeong.appointment.domain.entity.Appointment;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long>, AppointmentQueryRepository {
+    Optional<Appointment> findByAppointmentCodeAndIsDeletedFalse(String appointmentCode);
+
     List<Appointment> findAllByCustomer_IdAndAppointmentDateBetweenAndIsDeletedFalse(Long customerId, LocalDate startDate, LocalDate endDate);
 
     Boolean existsByCustomer_NameAndCustomer_PhoneAndAppointmentDateAndIsDeletedFalse(String name, String phone, LocalDate appointmentDate);

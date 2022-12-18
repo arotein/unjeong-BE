@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AppointmentType {
-    CALL("전화상담예약"),
-    VISIT("방문예약");
+public enum AppointmentType { // 상담 종류
+    CALL("전화상담"),
+    VISIT("방문상담");
 
     public String description;
 }

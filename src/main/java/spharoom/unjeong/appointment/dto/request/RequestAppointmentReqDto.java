@@ -55,6 +55,10 @@ public class RequestAppointmentReqDto {
                 .build();
     }
 
+    public LocalTime getAppointmentTime() {
+        return LocalTime.of(appointmentHour, 0);
+    }
+
     public RequestAppointmentReqDto checkValidation() {
         LocalDate nowDate = LocalDate.now();
         LocalDate nextWeekDate = nowDate.plusDays(7);

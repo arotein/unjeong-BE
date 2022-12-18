@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import spharoom.unjeong.appointment.dto.request.AlterAppointmentReqDto;
 import spharoom.unjeong.global.common.BaseEntity;
 import spharoom.unjeong.global.common.CommonException;
+import spharoom.unjeong.global.common.UniqueCodeGenerator;
 import spharoom.unjeong.global.enumeration.AppointmentState;
 import spharoom.unjeong.global.enumeration.AppointmentType;
 
@@ -24,12 +25,16 @@ public class Appointment extends BaseEntity { // 200 ~
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "appointment_id")
     private Long id;
+    @Comment("예약코드")
+    @Builder.Default
+    @Column(nullable = false, unique = true)
+    private String appointmentCode = UniqueCodeGenerator.generateCode();
     @Comment("예약종류")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AppointmentType appointmentType;
-    @Builder.Default
     @Comment("예약상태")
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AppointmentState appointmentState = AppointmentState.WAITING;
@@ -41,12 +46,11 @@ public class Appointment extends BaseEntity { // 200 ~
     @Comment("예약시간")
     @Column(nullable = false)
     private LocalTime appointmentTime;
-    @Builder.Default
     @Comment("예약등록시간")
+    @Builder.Default
     private LocalDateTime requestDateTime = LocalDateTime.now();
     @Comment("예약메모")
     private String description; // 관리자용
-
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
@@ -94,5 +98,10 @@ public class Appointment extends BaseEntity { // 200 ~
                 .linkToCustomer(customer);
         toStateAltered();
         return copiedAppointment;
+    }
+
+    public Appointment regenerateAppointmentCode() {
+        this.appointmentCode = UniqueCodeGenerator.generateCode();
+        return this;
     }
 }

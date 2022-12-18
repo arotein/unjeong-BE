@@ -8,7 +8,7 @@ import lombok.Getter;
 public enum AppointmentState {
     WAITING("상담대기중"),
 
-    ALTERED("예약시간변경됨"),
+    ALTERED("예약변경됨"),
     CANCELED("예약취소됨"),
     DONE("상담완료");
 

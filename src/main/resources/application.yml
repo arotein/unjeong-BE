@@ -42,9 +42,19 @@ global:
 spring:
   config:
     activate:
+      on-profile: prod
+  jpa:
+    hibernate.ddl-auto: validate
+
+---
+
+spring:
+  config:
+    activate:
       on-profile: dev
   jpa:
     properties:
       hibernate:
         format_sql: true
         show_sql: true
+    hibernate.ddl-auto: update

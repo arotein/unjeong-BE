@@ -7,16 +7,14 @@ import spharoom.unjeong.appointment.dto.request.RequestAppointmentReqDto;
 import spharoom.unjeong.appointment.dto.response.AppointmentResDto;
 import spharoom.unjeong.appointment.dto.response.AvailableCheckResDto;
 
-import java.util.List;
-
 public interface CustomerAppointmentService {
-    Long requestAppointment(RequestAppointmentReqDto dto);
+    String requestAppointment(RequestAppointmentReqDto dto);
 
-    List<AppointmentResDto> findAllAppointmentByNameAndPhone(FindAppointmentCondition condition);
+    AppointmentResDto findAllAppointmentByNameAndPhone(FindAppointmentCondition condition);
 
-    Long alterAppointment(Long appointmentId, AlterAppointmentReqDto dto);
+    String alterAppointment(String appointmentCode, AlterAppointmentReqDto dto);
 
-    Long cancelAppointment(Long appointmentId);
+    String cancelAppointment(String appointmentCode);
 
     AvailableCheckResDto availableTimeCheck(AvailableCheckCondition condition);
 }

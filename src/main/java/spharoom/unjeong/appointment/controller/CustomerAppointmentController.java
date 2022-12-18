@@ -22,7 +22,7 @@ public class CustomerAppointmentController {
     @PostMapping
     public CommonResponse requestAppointment(@RequestBody @Validated RequestAppointmentReqDto dto) {
         return CommonResponse.builder()
-                .data(Map.of("appointmentId", customerAppointmentService.requestAppointment(dto.checkValidation())))
+                .data(Map.of("appointmentCode", customerAppointmentService.requestAppointment(dto.checkValidation())))
                 .build();
     }
 
@@ -43,19 +43,19 @@ public class CustomerAppointmentController {
     }
 
     // 예약 변경
-    @PatchMapping("/{appointmentId}")
-    public CommonResponse alterAppointment(@PathVariable Long appointmentId,
+    @PatchMapping("/{appointmentCode}")
+    public CommonResponse alterAppointment(@PathVariable String appointmentCode,
                                            @RequestBody @Validated AlterAppointmentReqDto dto) {
         return CommonResponse.builder()
-                .data(Map.of("appointmentId", customerAppointmentService.alterAppointment(appointmentId, dto.checkValidation())))
+                .data(Map.of("appointmentCode", customerAppointmentService.alterAppointment(appointmentCode, dto.checkValidation())))
                 .build();
     }
 
     // 예약 취소
-    @DeleteMapping("/{appointmentId}")
-    public CommonResponse cancelAppointment(@PathVariable Long appointmentId) {
+    @DeleteMapping("/{appointmentCode}")
+    public CommonResponse cancelAppointment(@PathVariable String appointmentCode) {
         return CommonResponse.builder()
-                .data(Map.of("appointmentId", customerAppointmentService.cancelAppointment(appointmentId)))
+                .data(Map.of("appointmentCode", customerAppointmentService.cancelAppointment(appointmentCode)))
                 .build();
     }
 }

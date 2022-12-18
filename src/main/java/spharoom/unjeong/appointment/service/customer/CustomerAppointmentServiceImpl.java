@@ -1,8 +1,12 @@
 package spharoom.unjeong.appointment.service.customer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import spharoom.unjeong.appointment.domain.entity.Appointment;
 import spharoom.unjeong.appointment.domain.entity.Customer;
@@ -24,29 +28,36 @@ import java.util.TreeMap;
 /***
  * 스케줄러 : 매일 0시마다 WAITING이었던 전날 예약을 DONE으로 변경, CANCELED은 deleteData
  */
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CustomerAppointmentServiceImpl implements CustomerAppointmentService { // 100~
+public class CustomerAppointmentServiceImpl implements CustomerAppointmentService { // 108~
     private final CustomerRepository customerRepository;
     private final AppointmentRepository appointmentRepository;
 
     @Override
-    public Long requestAppointment(RequestAppointmentReqDto dto) {
+    public String requestAppointment(RequestAppointmentReqDto dto) {
+        // 1. 첫 예약자의 경우 객체 생성
         Customer customer = customerRepository.findByNameAndPhone(dto.getName(), dto.getPhone()).orElseGet(() -> dto.toCustomerEntity());
-        // 1. 중복예약 체크(하루에 한 팀만)
-        Boolean isExist = appointmentRepository.existsByCustomer_NameAndCustomer_PhoneAndAppointmentDateAndIsDeletedFalse(customer.getName(), customer.getPhone(), dto.getAppointmentDate());
-        if (isExist) {
+        // 2. 요청자가 해당 날짜에 예약한게 있는지 확인 (예약자는 날짜별로 한 번의 예약만 가능)
+        Boolean isExistDate = appointmentRepository.existsByCustomer_NameAndCustomer_PhoneAndAppointmentDateAndIsDeletedFalse(customer.getName(), customer.getPhone(), dto.getAppointmentDate());
+        if (isExistDate) {
             throw new CommonException(100, "선택한 날에 이미 예약이 존재합니다.", HttpStatus.BAD_REQUEST);
         }
-        // 2. 동시성 이슈 처리
-        // 3. 카톡 안내메세지 외부 API 호출(비동기처리)
-        return appointmentRepository.save(dto.toAppointmentEntity(customer)).getId();
+        // 3. 요청자가 요청 날짜에 예약한 게 없으면 요청 시간에 예약가능한지 확인
+        Boolean isExistTime = appointmentRepository.existsByAppointmentDateAndAndAppointmentTimeAndIsDeletedFalse(dto.getAppointmentDate(), dto.getAppointmentTime());
+        if (isExistTime) {
+            throw new CommonException(107, "선택한 시간에 예약할 수 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+        // 4. 동시성 이슈 처리
+        // 5. 카톡 안내메세지 외부 API 호출(비동기처리)
+        return appointmentSafeSave(dto.toAppointmentEntity(customer)).getAppointmentCode();
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<AppointmentResDto> findAllAppointmentByNameAndPhone(FindAppointmentCondition condition) {
+    public AppointmentResDto findAllAppointmentByNameAndPhone(FindAppointmentCondition condition) {
         LocalDate today = LocalDate.now();
         Customer customer = customerRepository.findByNameAndPhone(condition.getName(), condition.getPhone())
                 .orElseThrow(() -> new CommonException(101, "7일 이내에 예약한 이력이 없습니다.", HttpStatus.BAD_REQUEST));
@@ -54,16 +65,17 @@ public class CustomerAppointmentServiceImpl implements CustomerAppointmentServic
         if (appointmentList.size() == 0) {
             throw new CommonException(102, "7일 이내에 예약한 이력이 없습니다.", HttpStatus.BAD_REQUEST);
         }
-        return appointmentList.stream().map(appointment -> AppointmentResDto.of(appointment)).toList();
+        List<AppointmentResDto.InnerDto> innerDtoList = appointmentList.stream().map(appointment -> AppointmentResDto.InnerDto.of(appointment)).toList();
+        return new AppointmentResDto(condition.getName(), innerDtoList);
     }
 
     @Override
-    public Long alterAppointment(Long appointmentId, AlterAppointmentReqDto dto) {
-        Appointment appointment = appointmentRepository.findById(appointmentId)
+    public String alterAppointment(String appointmentCode, AlterAppointmentReqDto dto) {
+        Appointment appointment = appointmentRepository.findByAppointmentCodeAndIsDeletedFalse(appointmentCode)
                 .orElseThrow(() -> new CommonException(103, "예약을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST));
-        Customer customer = appointment.getCustomer();
 
-        // 1. 검색된 customer가 해당 날짜에 예약한게 있는지 확인
+        // 1. 검색된 customer가 해당 날짜에 예약한게 있는지 확인 (예약자는 날짜별로 한 번의 예약만 가능)
+        Customer customer = appointment.getCustomer();
         Boolean isExistDate = appointmentRepository.existsByCustomer_IdAndAppointmentDateAndIsDeletedFalse(customer.getId(), dto.getAlterDate());
         if (isExistDate) {
             throw new CommonException(104, "선택한 날에 이미 예약이 존재합니다.", HttpStatus.BAD_REQUEST);
@@ -77,15 +89,15 @@ public class CustomerAppointmentServiceImpl implements CustomerAppointmentServic
 
         // 3. 2번 동시성이슈 처리 (추후 구현)
         Appointment copiedAppointment = appointment.copyAndAlterAppointment(dto, customer);
-        return appointmentRepository.save(copiedAppointment).getId();
+        return appointmentSafeSave(copiedAppointment.regenerateAppointmentCode()).getAppointmentCode();
     }
 
     @Override
-    public Long cancelAppointment(Long appointmentId) {
-        Appointment appointment = appointmentRepository.findById(appointmentId)
+    public String cancelAppointment(String appointmentCode) {
+        Appointment appointment = appointmentRepository.findByAppointmentCodeAndIsDeletedFalse(appointmentCode)
                 .orElseThrow(() -> new CommonException(106, "예약을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST));
         appointment.toStateCanceled();
-        return appointment.getId();
+        return appointment.getAppointmentCode();
     }
 
     @Transactional(readOnly = true)
@@ -106,5 +118,21 @@ public class CustomerAppointmentServiceImpl implements CustomerAppointmentServic
             timeMap.put(k, k);
         }
         return timeMap;
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    @SneakyThrows
+    Appointment appointmentSafeSave(Appointment appointment) {
+        Appointment savedAppointment = null;
+        for (int k = 1; k <= 6; k++) {
+            try {
+                savedAppointment = appointmentRepository.save(appointment);
+            } catch (DataIntegrityViolationException ex) {
+                log.error("DataIntegrityViolationException 발생 --> AppointmentCode가 Unique하지 않게 생성됨({})", k);
+                Thread.sleep(500);
+                appointment.regenerateAppointmentCode();
+            }
+        }
+        return savedAppointment;
     }
 }

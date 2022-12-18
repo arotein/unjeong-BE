@@ -41,8 +41,11 @@ public class AlterAppointmentReqDto {
         }
 
         if (alterDate != null && alterHour != null) {
-            if (alterDate.isBefore(nowDate) || alterDate.isAfter(nextWeekDate)) {
-                throw new CommonException(9, "7일 이내만 예약이 가능합니다.");
+            if (alterDate.isBefore(nowDate)) {
+                throw new CommonException(9, "이미 지난 날짜는 예약할 수 없습니다.");
+            }
+            if (alterDate.isAfter(nextWeekDate)) {
+                throw new CommonException(15, "7일 이내만 예약이 가능합니다.");
             }
             if (alterDate.getDayOfWeek() == DayOfWeek.SUNDAY) {
                 throw new CommonException(10, "일요일은 예약이 불가능합니다.");
