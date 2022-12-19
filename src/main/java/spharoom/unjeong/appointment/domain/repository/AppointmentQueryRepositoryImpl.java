@@ -17,7 +17,7 @@ public class AppointmentQueryRepositoryImpl extends QuerydslSupport implements A
 
     @Override
     public void stateToDoneOfDateWithBatch(LocalDate date) { // 전날 예약을 모두 '상담완료'로 변경
-        getQueryFactory().update(appointment)
+        update(appointment)
                 .set(appointment.appointmentState, AppointmentState.DONE)
                 .where(appointment.appointmentState.eq(AppointmentState.WAITING),
                         appointment.appointmentDate.eq(date),
@@ -27,7 +27,7 @@ public class AppointmentQueryRepositoryImpl extends QuerydslSupport implements A
 
     @Override
     public void deleteAppointmentOfDateWithBatch(LocalDate date) { // 전날 취소된 예약을 조회불가하게 delete
-        getQueryFactory().update(appointment)
+        update(appointment)
                 .set(appointment.isDeleted, true)
                 .where(appointment.appointmentState.eq(AppointmentState.CANCELED),
                         appointment.appointmentDate.eq(date),
