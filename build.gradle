@@ -15,7 +15,7 @@ jib {
         }
     }
     to {
-        image = System.getenv("DOCKERHUB_IMG_UNJEONG_CUSTOMER")
+        image = System.getenv("DOCKERHUB_IMG_UNJEONG")
         tags = [System.getenv("IMG_TAG")]
         auth {
             username = System.getenv("DOCKERHUB_ID")
