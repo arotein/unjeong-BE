@@ -16,7 +16,7 @@ import spharoom.unjeong.appointment.dto.request.AlterAppointmentReqDto;
 import spharoom.unjeong.appointment.dto.request.AvailableCheckCondition;
 import spharoom.unjeong.appointment.dto.request.FindAppointmentCondition;
 import spharoom.unjeong.appointment.dto.request.RequestAppointmentReqDto;
-import spharoom.unjeong.appointment.dto.response.AppointmentResDto;
+import spharoom.unjeong.appointment.dto.response.AppointmentForCustomerResDto;
 import spharoom.unjeong.appointment.dto.response.AvailableCheckResDto;
 import spharoom.unjeong.global.common.CommonException;
 
@@ -57,7 +57,7 @@ public class CustomerAppointmentServiceImpl implements CustomerAppointmentServic
 
     @Transactional(readOnly = true)
     @Override
-    public AppointmentResDto findAllAppointmentByNameAndPhone(FindAppointmentCondition condition) {
+    public AppointmentForCustomerResDto findAllAppointmentByNameAndPhone(FindAppointmentCondition condition) {
         LocalDate today = LocalDate.now();
         Customer customer = customerRepository.findByNameAndPhone(condition.getName(), condition.getPhone())
                 .orElseThrow(() -> new CommonException(101, "7일 이내에 예약한 이력이 없습니다.", HttpStatus.BAD_REQUEST));
@@ -65,8 +65,8 @@ public class CustomerAppointmentServiceImpl implements CustomerAppointmentServic
         if (appointmentList.size() == 0) {
             throw new CommonException(102, "7일 이내에 예약한 이력이 없습니다.", HttpStatus.BAD_REQUEST);
         }
-        List<AppointmentResDto.InnerDto> innerDtoList = appointmentList.stream().map(appointment -> AppointmentResDto.InnerDto.of(appointment)).toList();
-        return new AppointmentResDto(condition.getName(), innerDtoList);
+        List<AppointmentForCustomerResDto.InnerDto> innerDtoList = appointmentList.stream().map(appointment -> AppointmentForCustomerResDto.InnerDto.of(appointment)).toList();
+        return new AppointmentForCustomerResDto(condition.getName(), innerDtoList).addIndex();
     }
 
     @Override

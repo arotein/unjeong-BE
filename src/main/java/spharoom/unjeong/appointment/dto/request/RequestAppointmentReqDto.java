@@ -73,7 +73,10 @@ public class RequestAppointmentReqDto {
         if (numberOfPeople <= 0 || numberOfPeople >= 10) {
             throw new CommonException(8, "신청 인원수는 1~9명만 가능합니다.");
         }
-        if (appointmentDate.isBefore(nowDate) || appointmentDate.isAfter(nextWeekDate)) {
+        if (appointmentDate.isBefore(nowDate)) {
+            throw new CommonException(16, "지난 날짜는 예약할 수 없습니다.");
+        }
+        if (appointmentDate.isAfter(nextWeekDate)) {
             throw new CommonException(9, "7일 이내만 예약이 가능합니다.");
         }
         if (appointmentDate.getDayOfWeek() == DayOfWeek.SUNDAY) {

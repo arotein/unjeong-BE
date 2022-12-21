@@ -13,9 +13,15 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppointmentResDto {
+public class AppointmentForCustomerResDto {
     private String name;
     private List<InnerDto> appointmentList;
+
+    public AppointmentForCustomerResDto addIndex() {
+        appointmentList.forEach(inner -> inner.setIndex(appointmentList.indexOf(inner)));
+        return this;
+    }
+
 
     @Getter
     @Setter
@@ -23,6 +29,7 @@ public class AppointmentResDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class InnerDto {
+        private Integer index;
         private String appointmentCode;
         private String appointmentType;
         private String appointmentState;
