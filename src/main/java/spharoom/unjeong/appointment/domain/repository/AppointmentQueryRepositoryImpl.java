@@ -1,6 +1,8 @@
 package spharoom.unjeong.appointment.domain.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 import org.springframework.stereotype.Repository;
 import spharoom.unjeong.appointment.domain.entity.Appointment;
 import spharoom.unjeong.appointment.dto.request.AppointmentQueryCondition;
@@ -12,11 +14,30 @@ import java.util.List;
 
 import static spharoom.unjeong.appointment.domain.entity.QAppointment.appointment;
 import static spharoom.unjeong.appointment.domain.entity.QCustomer.customer;
+import static spharoom.unjeong.appointment.domain.entity.QVacation.vacation;
 
 @Repository
 public class AppointmentQueryRepositoryImpl extends QuerydslSupport implements AppointmentQueryRepository {
     public AppointmentQueryRepositoryImpl() {
         super(Appointment.class);
+    }
+
+    @Override
+    public List<Appointment> findAllRequiredContactCustomer() {
+        LocalDate nowDate = LocalDate.now();
+        // 휴가일 탐색
+        JPQLQuery<LocalDate> subQuery = JPAExpressions
+                .select(vacation.vacationDate)
+                .from(vacation)
+                .where(dateBetween(nowDate, nowDate.plusWeeks(1)));
+
+        // 먼저 예약했으나 휴가일과 겹친 예약 조회
+        return selectFrom(appointment)
+                .join(appointment.customer, customer).fetchJoin()
+                .where(notDeleted(),
+                        appointment.appointmentState.eq(AppointmentState.WAITING),
+                        appointment.appointmentDate.in(subQuery))
+                .fetch();
     }
 
     @Override

@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface AppointmentQueryRepository {
+    List<Appointment> findAllRequiredContactCustomer();
+
     List<Appointment> findAllAppointmentTwoWeeks(AppointmentQueryCondition queryCondition);
 
     void stateToDoneOfDateWithBatch(LocalDate date);

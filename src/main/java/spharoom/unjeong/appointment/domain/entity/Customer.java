@@ -30,8 +30,7 @@ public class Customer extends BaseEntity { // 300~
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Appointment> appointmentList = new ArrayList<>();
 
-    public Customer linkToAppointment(Appointment appointment) {
+    public void linkToAppointment(Appointment appointment) {
         appointmentList.add(appointment);
-        return this;
     }
 }

@@ -2,6 +2,7 @@ package spharoom.unjeong.appointment.domain.entity;
 
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import spharoom.unjeong.global.common.BaseEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Admin {
+public class Admin extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "admin_id")

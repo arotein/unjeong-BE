@@ -53,6 +53,10 @@ public class Appointment extends BaseEntity { // 200 ~
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "appointment_management_id")
+    private AppointmentManagement appointmentManagement;
+
     public Appointment toStateDone() {
         if (appointmentState != AppointmentState.WAITING) {
             throw new CommonException(200, "완료될 수 없는 예약입니다.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -78,9 +82,15 @@ public class Appointment extends BaseEntity { // 200 ~
         return this;
     }
 
-    public Appointment linkToCustomer(Customer customer) {
+    public Appointment mainLinkToCustomer(Customer customer) {
         this.customer = customer;
         customer.linkToAppointment(this);
+        return this;
+    }
+
+    public Appointment mainLinkToAppointmentManagement(AppointmentManagement appointmentManagement) {
+        this.appointmentManagement = appointmentManagement;
+        appointmentManagement.linkToAppointment(this);
         return this;
     }
 
@@ -93,7 +103,7 @@ public class Appointment extends BaseEntity { // 200 ~
                 .appointmentTime(dto.getAlterTime() != null ? dto.getAlterTime() : appointmentTime)
                 .requestDateTime(requestDateTime)
                 .build()
-                .linkToCustomer(customer);
+                .mainLinkToCustomer(customer);
         toStateAltered();
         return copiedAppointment;
     }

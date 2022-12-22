@@ -11,6 +11,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import spharoom.unjeong.appointment.domain.repository.AppointmentRepository;
+import spharoom.unjeong.appointment.domain.repository.VacationRepository;
 
 import java.time.LocalDate;
 
@@ -22,12 +23,14 @@ public class AppointmentJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final AppointmentRepository appointmentRepository;
+    private final VacationRepository vacationRepository;
 
     @Bean
     public Job appointmentStateJob() {
         return jobBuilderFactory.get("appointmentStateJob")
                 .start(toDoneStep()).on("*")
-                .to(deleteAppointmentStep())
+                .to(deleteAppointmentStep()).on("*")
+                .to(deleteVacationStep())
                 .end()
                 .build();
     }
@@ -39,8 +42,7 @@ public class AppointmentJobConfig {
                     LocalDate yesterday = LocalDate.now().minusDays(1L);
                     appointmentRepository.stateToDoneOfDateWithBatch(yesterday);
                     return RepeatStatus.FINISHED;
-                })
-                .build();
+                }).build();
     }
 
     @Bean
@@ -50,7 +52,16 @@ public class AppointmentJobConfig {
                     LocalDate yesterday = LocalDate.now().minusDays(1L);
                     appointmentRepository.deleteAppointmentOfDateWithBatch(yesterday);
                     return RepeatStatus.FINISHED;
-                })
-                .build();
+                }).build();
+    }
+
+    @Bean
+    public Step deleteVacationStep() {
+        return stepBuilderFactory.get("deleteVacationStep")
+                .tasklet((contribution, chunkContext) -> {
+                    LocalDate yesterday = LocalDate.now().minusDays(1L);
+                    vacationRepository.deleteByVacationDate(yesterday);
+                    return RepeatStatus.FINISHED;
+                }).build();
     }
 }

@@ -45,7 +45,7 @@ public class RequestAppointmentReqDto {
                 .appointmentDate(appointmentDate)
                 .appointmentTime(LocalTime.of(appointmentHour, 0))
                 .build()
-                .linkToCustomer(customer);
+                .mainLinkToCustomer(customer);
     }
 
     public Customer toCustomerEntity() {

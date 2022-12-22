@@ -12,6 +12,7 @@ import spharoom.unjeong.appointment.domain.entity.Appointment;
 import spharoom.unjeong.appointment.domain.entity.Customer;
 import spharoom.unjeong.appointment.domain.repository.AppointmentRepository;
 import spharoom.unjeong.appointment.domain.repository.CustomerRepository;
+import spharoom.unjeong.appointment.domain.repository.VacationRepository;
 import spharoom.unjeong.appointment.dto.request.AlterAppointmentReqDto;
 import spharoom.unjeong.appointment.dto.request.AvailableCheckCondition;
 import spharoom.unjeong.appointment.dto.request.FindAppointmentCondition;
@@ -21,6 +22,7 @@ import spharoom.unjeong.appointment.dto.response.AvailableCheckResDto;
 import spharoom.unjeong.global.common.CommonException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -32,12 +34,18 @@ import java.util.TreeMap;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CustomerAppointmentServiceImpl implements CustomerAppointmentService { // 108~
+public class CustomerAppointmentServiceImpl implements CustomerAppointmentService { // 109~
     private final CustomerRepository customerRepository;
     private final AppointmentRepository appointmentRepository;
+    private final VacationRepository vacationRepository;
 
     @Override
     public String requestAppointment(RequestAppointmentReqDto dto) {
+        // 0. 예약가능 날짜인지 체크
+        boolean exist = vacationRepository.existsByVacationDate(dto.getAppointmentDate());
+        if (exist) {
+            throw new CommonException(108, "선택한 날에 예약할 수 없습니다.", HttpStatus.BAD_REQUEST);
+        }
         // 1. 첫 예약자의 경우 객체 생성
         Customer customer = customerRepository.findByNameAndPhone(dto.getName(), dto.getPhone()).orElseGet(() -> dto.toCustomerEntity());
         // 2. 요청자가 해당 날짜에 예약한게 있는지 확인 (예약자는 날짜별로 한 번의 예약만 가능)
@@ -71,6 +79,12 @@ public class CustomerAppointmentServiceImpl implements CustomerAppointmentServic
 
     @Override
     public String alterAppointment(String appointmentCode, AlterAppointmentReqDto dto) {
+        // 0. 예약가능 날짜인지 체크
+        boolean exist = vacationRepository.existsByVacationDate(dto.getAlterDate());
+        if (exist) {
+            throw new CommonException(108, "선택한 날에 예약할 수 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+
         Appointment appointment = appointmentRepository.findByAppointmentCodeAndIsDeletedFalse(appointmentCode)
                 .orElseThrow(() -> new CommonException(103, "예약을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST));
 
@@ -103,6 +117,11 @@ public class CustomerAppointmentServiceImpl implements CustomerAppointmentServic
     @Transactional(readOnly = true)
     @Override
     public AvailableCheckResDto availableTimeCheck(AvailableCheckCondition condition) {
+        // 0. 예약가능 날짜인지 체크
+        boolean exist = vacationRepository.existsByVacationDate(condition.getDate());
+        if (exist) {
+            return new AvailableCheckResDto(new ArrayList<>());
+        }
         List<Appointment> appointmentList = appointmentRepository.findAllByAppointmentDateAndIsDeletedFalse(condition.getDate());
         Map<Integer, Integer> availableTimeMap = generateAvailableTimeMap();
         appointmentList.forEach(appointment -> {
