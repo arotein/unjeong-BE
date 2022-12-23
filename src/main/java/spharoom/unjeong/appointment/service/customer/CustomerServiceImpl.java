@@ -34,7 +34,7 @@ import java.util.TreeMap;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CustomerAppointmentServiceImpl implements CustomerAppointmentService { // 109~
+public class CustomerServiceImpl implements CustomerService { // 109~
     private final CustomerRepository customerRepository;
     private final AppointmentRepository appointmentRepository;
     private final VacationRepository vacationRepository;

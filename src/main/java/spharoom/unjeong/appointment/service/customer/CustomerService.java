@@ -7,7 +7,7 @@ import spharoom.unjeong.appointment.dto.request.RequestAppointmentReqDto;
 import spharoom.unjeong.appointment.dto.response.AppointmentForCustomerResDto;
 import spharoom.unjeong.appointment.dto.response.AvailableCheckResDto;
 
-public interface CustomerAppointmentService {
+public interface CustomerService {
     String requestAppointment(RequestAppointmentReqDto dto);
 
     AppointmentForCustomerResDto findAllAppointmentByNameAndPhone(FindAppointmentCondition condition);

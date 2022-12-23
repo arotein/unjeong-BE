@@ -7,7 +7,7 @@ import spharoom.unjeong.appointment.dto.request.AlterAppointmentReqDto;
 import spharoom.unjeong.appointment.dto.request.AvailableCheckCondition;
 import spharoom.unjeong.appointment.dto.request.FindAppointmentCondition;
 import spharoom.unjeong.appointment.dto.request.RequestAppointmentReqDto;
-import spharoom.unjeong.appointment.service.customer.CustomerAppointmentService;
+import spharoom.unjeong.appointment.service.customer.CustomerService;
 import spharoom.unjeong.global.common.CommonResponse;
 
 import java.util.Map;
@@ -15,14 +15,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("${global.api.customer-base-path}/appointment")
 @RequiredArgsConstructor
-public class CustomerAppointmentController {
-    private final CustomerAppointmentService customerAppointmentService;
+public class CustomerController {
+    private final CustomerService customerService;
 
     // 예약신청
     @PostMapping
     public CommonResponse requestAppointment(@RequestBody @Validated RequestAppointmentReqDto dto) {
         return CommonResponse.builder()
-                .data(Map.of("appointmentCode", customerAppointmentService.requestAppointment(dto.checkValidation())))
+                .data(Map.of("appointmentCode", customerService.requestAppointment(dto.checkValidation())))
                 .build();
     }
 
@@ -30,7 +30,7 @@ public class CustomerAppointmentController {
     @GetMapping
     public CommonResponse findAppointmentByNameAndPhone(@Validated FindAppointmentCondition condition) {
         return CommonResponse.builder()
-                .data(customerAppointmentService.findAllAppointmentByNameAndPhone(condition))
+                .data(customerService.findAllAppointmentByNameAndPhone(condition))
                 .build();
     }
 
@@ -38,7 +38,7 @@ public class CustomerAppointmentController {
     @GetMapping("/available")
     public CommonResponse availableTimeCheck(@Validated AvailableCheckCondition condition) {
         return CommonResponse.builder()
-                .data(customerAppointmentService.availableTimeCheck(condition.checkValidation()))
+                .data(customerService.availableTimeCheck(condition.checkValidation()))
                 .build();
     }
 
@@ -47,7 +47,7 @@ public class CustomerAppointmentController {
     public CommonResponse alterAppointment(@PathVariable String appointmentCode,
                                            @RequestBody @Validated AlterAppointmentReqDto dto) {
         return CommonResponse.builder()
-                .data(Map.of("appointmentCode", customerAppointmentService.alterAppointment(appointmentCode, dto.checkValidation())))
+                .data(Map.of("appointmentCode", customerService.alterAppointment(appointmentCode, dto.checkValidation())))
                 .build();
     }
 
@@ -55,7 +55,7 @@ public class CustomerAppointmentController {
     @DeleteMapping("/{appointmentCode}")
     public CommonResponse cancelAppointment(@PathVariable String appointmentCode) {
         return CommonResponse.builder()
-                .data(Map.of("appointmentCode", customerAppointmentService.cancelAppointment(appointmentCode)))
+                .data(Map.of("appointmentCode", customerService.cancelAppointment(appointmentCode)))
                 .build();
     }
 }

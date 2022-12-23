@@ -4,11 +4,14 @@ import spharoom.unjeong.appointment.dto.request.AppointmentQueryCondition;
 import spharoom.unjeong.appointment.dto.request.VacationReqDto;
 import spharoom.unjeong.appointment.dto.response.AppointmentQueryResDto;
 import spharoom.unjeong.appointment.dto.response.RequiredContactCustomerResDto;
+import spharoom.unjeong.appointment.dto.response.VacationResDto;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public interface AdminAppointmentService {
+public interface AdminService {
+    List<VacationResDto> findVacation();
+
     LocalDate registerVacation(VacationReqDto dto);
 
     LocalDate cancelVacation(VacationReqDto dto);

@@ -9,10 +9,7 @@ import spharoom.unjeong.appointment.domain.repository.AppointmentRepository;
 import spharoom.unjeong.appointment.domain.repository.VacationRepository;
 import spharoom.unjeong.appointment.dto.request.AppointmentQueryCondition;
 import spharoom.unjeong.appointment.dto.request.VacationReqDto;
-import spharoom.unjeong.appointment.dto.response.AppointmentQueryResDto;
-import spharoom.unjeong.appointment.dto.response.AppointmentQueryResPreDto;
-import spharoom.unjeong.appointment.dto.response.RequiredContactCustomerResDto;
-import spharoom.unjeong.appointment.dto.response.RequiredContactCustomerResPreDto;
+import spharoom.unjeong.appointment.dto.response.*;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -20,9 +17,16 @@ import java.util.*;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AdminAppointmentServiceImpl implements AdminAppointmentService {
+public class AdminServiceImpl implements AdminService {
     private final AppointmentRepository appointmentRepository;
     private final VacationRepository vacationRepository;
+
+    @Override
+    public List<VacationResDto> findVacation() {
+        LocalDate nowDate = LocalDate.now();
+        return vacationRepository.findAllByVacationDateIsGreaterThanEqual(nowDate)
+                .stream().map(vacation -> VacationResDto.of(vacation)).toList();
+    }
 
     @Override
     public LocalDate registerVacation(VacationReqDto dto) {
