@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface VacationRepository extends JpaRepository<Vacation, Long> {
     Optional<Vacation> findByVacationDate(LocalDate date);
 
-    List<Vacation> findAllByVacationDateIsGreaterThanEqual(LocalDate date);
+    List<Vacation> findAllByVacationDateIsGreaterThanEqualOrderByVacationDateAsc(LocalDate date);
 
     void deleteByVacationDate(LocalDate date);
 

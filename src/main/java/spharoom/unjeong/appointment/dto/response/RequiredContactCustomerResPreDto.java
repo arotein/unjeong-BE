@@ -8,6 +8,7 @@ import spharoom.unjeong.global.enumeration.AppointmentType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 @Getter
@@ -24,7 +25,7 @@ public class RequiredContactCustomerResPreDto {
     private AppointmentState appointmentState;
     private Integer numberOfPeople;
     private LocalDate appointmentDate;
-    private Integer appointmentTime;
+    private LocalTime appointmentTime;
     private LocalDateTime requestDateTime;
 
     public static RequiredContactCustomerResPreDto of(Appointment appointment) {
@@ -37,7 +38,7 @@ public class RequiredContactCustomerResPreDto {
                 .appointmentState(appointment.getAppointmentState())
                 .numberOfPeople(appointment.getNumberOfPeople())
                 .appointmentDate(appointment.getAppointmentDate())
-                .appointmentTime(appointment.getAppointmentTime().getHour())
+                .appointmentTime(appointment.getAppointmentTime())
                 .requestDateTime(appointment.getRequestDateTime())
                 .build();
     }

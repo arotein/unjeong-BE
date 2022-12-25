@@ -82,6 +82,14 @@ public class Appointment extends BaseEntity { // 200 ~
         return this;
     }
 
+    public Appointment deleteCanceledAppointment() { // cancel한 날에 새로 예약을 할 경우 기존의 cancel 이력은 delete
+        if (appointmentState != AppointmentState.CANCELED) {
+            throw new CommonException(203, "삭제할 수 없는 예약입니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        deleteData();
+        return this;
+    }
+
     public Appointment mainLinkToCustomer(Customer customer) {
         this.customer = customer;
         customer.linkToAppointment(this);
@@ -104,8 +112,8 @@ public class Appointment extends BaseEntity { // 200 ~
                 .requestDateTime(requestDateTime)
                 .build()
                 .mainLinkToCustomer(customer);
-        toStateAltered();
-        return copiedAppointment;
+        toStateAltered(); // 기존 객체 상태변경
+        return copiedAppointment; // 새 객체 리턴
     }
 
     public Appointment regenerateAppointmentCode() {

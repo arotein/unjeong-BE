@@ -14,12 +14,12 @@ import java.util.List;
 @AllArgsConstructor
 public class AppointmentQueryResDto {
     private Integer index;
-    private LocalDate appointmentDate;
-    private List<AppointmentQueryResPreDto> appointmentList;
+    private LocalDate date;
+    private List<AppointmentQueryResPreDto> customerList;
 
-    public AppointmentQueryResDto(LocalDate appointmentDate, List<AppointmentQueryResPreDto> appointmentList) {
-        appointmentList.forEach(preDto -> preDto.setIndex(appointmentList.indexOf(preDto)));
-        this.appointmentDate = appointmentDate;
-        this.appointmentList = appointmentList;
+    public AppointmentQueryResDto(LocalDate date, List<AppointmentQueryResPreDto> customerList) {
+        customerList.forEach(preDto -> preDto.setIndex(customerList.indexOf(preDto)));
+        this.date = date;
+        this.customerList = customerList;
     }
 }

@@ -14,16 +14,15 @@ import java.util.List;
 @Setter
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class AppointmentForCustomerResDto {
     private String name;
     private List<InnerDto> appointmentList;
 
-    public AppointmentForCustomerResDto addIndex() {
+    public AppointmentForCustomerResDto(String name, List<InnerDto> appointmentList) {
         appointmentList.forEach(inner -> inner.setIndex(appointmentList.indexOf(inner)));
-        return this;
+        this.name = name;
+        this.appointmentList = appointmentList;
     }
-
 
     @Getter
     @Setter

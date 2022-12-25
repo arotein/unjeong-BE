@@ -24,7 +24,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<VacationResDto> findVacation() {
         LocalDate nowDate = LocalDate.now();
-        return vacationRepository.findAllByVacationDateIsGreaterThanEqual(nowDate)
+        return vacationRepository.findAllByVacationDateIsGreaterThanEqualOrderByVacationDateAsc(nowDate)
                 .stream().map(vacation -> VacationResDto.of(vacation)).toList();
     }
 
@@ -70,7 +70,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<RequiredContactCustomerResDto> findRequiredContactCustomer() {
+    public List<RequiredContactCustomerResDto> findRequiredContactCustomer() { // 날짜가 아니라 customer기준으로 묶자
         List<RequiredContactCustomerResDto> dtoList = new ArrayList<>();
         Map<LocalDate, List<RequiredContactCustomerResPreDto>> preDtoMap = new TreeMap<>();
 
