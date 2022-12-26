@@ -71,24 +71,26 @@ public class AdminServiceImpl implements AdminService {
     @Transactional(readOnly = true)
     @Override
     public List<RequiredContactCustomerResDto> findRequiredContactCustomer() { // 날짜가 아니라 customer기준으로 묶자
+        Map<CustomerMinDateDto, List<RequiredContactCustomerResPreDto>> preDtoMap = new TreeMap<>(Comparator.comparing(CustomerMinDateDto::getMinDateTime));
+
+        appointmentRepository.findAllRequiredContactCustomer()
+                .forEach(appointment -> {
+                    CustomerMinDateDto customerDto = new CustomerMinDateDto(appointment);
+                    if (!preDtoMap.containsKey(customerDto)) {
+                        List<RequiredContactCustomerResPreDto> preDtoList = new ArrayList<>();
+                        preDtoList.add(RequiredContactCustomerResPreDto.of(appointment));
+                        preDtoMap.put(customerDto, preDtoList);
+                    } else {
+                        preDtoMap.get(customerDto).add(RequiredContactCustomerResPreDto.of(appointment));
+                    }
+                });
+
         List<RequiredContactCustomerResDto> dtoList = new ArrayList<>();
-        Map<LocalDate, List<RequiredContactCustomerResPreDto>> preDtoMap = new TreeMap<>();
 
-        List<Appointment> appointmentList = appointmentRepository.findAllRequiredContactCustomer();
-        appointmentList.forEach(appointment -> {
-            if (!preDtoMap.containsKey(appointment.getAppointmentDate())) {
-                List<RequiredContactCustomerResPreDto> preDtoList = new ArrayList<>();
-                preDtoList.add(RequiredContactCustomerResPreDto.of(appointment));
-                preDtoMap.put(appointment.getAppointmentDate(), preDtoList);
-            } else {
-                preDtoMap.get(appointment.getAppointmentDate()).add(RequiredContactCustomerResPreDto.of(appointment));
-            }
-        });
-
-        Iterator<LocalDate> iterator = preDtoMap.keySet().iterator();
+        Iterator<CustomerMinDateDto> iterator = preDtoMap.keySet().iterator();
         while (iterator.hasNext()) {
-            LocalDate date = iterator.next();
-            dtoList.add(new RequiredContactCustomerResDto(date, preDtoMap.get(date)));
+            CustomerMinDateDto customerDto = iterator.next();
+            dtoList.add(new RequiredContactCustomerResDto(customerDto.getCustomer(), preDtoMap.get(customerDto)));
         }
         return dtoList;
     }

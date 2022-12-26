@@ -50,14 +50,14 @@ public class AppointmentQueryRepositoryImpl extends QuerydslSupport implements A
 
     @Override
     public List<Appointment> findAllRequiredContactCustomer() {
-        LocalDate nowDate = LocalDate.now();
+        LocalDate today = LocalDate.now();
         // 휴가일 탐색
         JPQLQuery<LocalDate> subQuery = JPAExpressions
                 .select(vacation.vacationDate)
                 .from(vacation)
-                .where(dateBetween(nowDate, nowDate.plusWeeks(1)));
+                .where(dateBetween(today, today.plusWeeks(1)));
 
-        // 먼저 예약했으나 휴가일과 겹친 예약 조회
+        // 예약했으나 이후 등록된 휴가일과 겹친 예약 조회
         return selectFrom(appointment)
                 .join(appointment.customer, customer).fetchJoin()
                 .where(notDeleted(),

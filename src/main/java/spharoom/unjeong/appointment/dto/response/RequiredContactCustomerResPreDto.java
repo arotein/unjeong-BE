@@ -2,7 +2,6 @@ package spharoom.unjeong.appointment.dto.response;
 
 import lombok.*;
 import spharoom.unjeong.appointment.domain.entity.Appointment;
-import spharoom.unjeong.appointment.domain.entity.Customer;
 import spharoom.unjeong.global.enumeration.AppointmentState;
 import spharoom.unjeong.global.enumeration.AppointmentType;
 
@@ -18,8 +17,6 @@ import java.time.format.DateTimeFormatter;
 @AllArgsConstructor
 public class RequiredContactCustomerResPreDto {
     private Integer index;
-    private String name;
-    private String phone;
     private String appointmentCode;
     private AppointmentType appointmentType;
     private AppointmentState appointmentState;
@@ -29,10 +26,7 @@ public class RequiredContactCustomerResPreDto {
     private LocalDateTime requestDateTime;
 
     public static RequiredContactCustomerResPreDto of(Appointment appointment) {
-        Customer customer = appointment.getCustomer();
         return RequiredContactCustomerResPreDto.builder()
-                .name(customer.getName())
-                .phone(customer.getPhone())
                 .appointmentCode(appointment.getAppointmentCode())
                 .appointmentType(appointment.getAppointmentType())
                 .appointmentState(appointment.getAppointmentState())
