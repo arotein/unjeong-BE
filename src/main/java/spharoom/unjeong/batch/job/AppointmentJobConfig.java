@@ -10,10 +10,14 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import spharoom.unjeong.appointment.domain.entity.Customer;
 import spharoom.unjeong.appointment.domain.repository.AppointmentRepository;
+import spharoom.unjeong.appointment.domain.repository.CustomerRepository;
 import spharoom.unjeong.appointment.domain.repository.VacationRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Configuration
@@ -24,6 +28,7 @@ public class AppointmentJobConfig {
     private final StepBuilderFactory stepBuilderFactory;
     private final AppointmentRepository appointmentRepository;
     private final VacationRepository vacationRepository;
+    private final CustomerRepository customerRepository;
 
     @Bean
     public Job appointmentStateJob() {
@@ -32,6 +37,13 @@ public class AppointmentJobConfig {
                 .to(deleteAppointmentStep()).on("*")
                 .to(deleteVacationStep())
                 .end()
+                .build();
+    }
+
+    @Bean
+    public Job deletePersonalInformationJob() {
+        return jobBuilderFactory.get("deletePersonalInformationJob")
+                .start(deletePersonalInformationStep())
                 .build();
     }
 
@@ -61,6 +73,17 @@ public class AppointmentJobConfig {
                 .tasklet((contribution, chunkContext) -> {
                     LocalDate yesterday = LocalDate.now().minusDays(1L);
                     vacationRepository.deleteByVacationDate(yesterday);
+                    return RepeatStatus.FINISHED;
+                }).build();
+    }
+
+    @Bean
+    public Step deletePersonalInformationStep() {
+        return stepBuilderFactory.get("deletePersonalInformationStep")
+                .tasklet((contribution, chunkContext) -> {
+                    LocalDateTime lastYear = LocalDateTime.now().minusYears(1);
+                    List<Customer> customerList = customerRepository.findAllByLastAppointmentRequestDateTimeIsBefore(lastYear);
+                    customerList.forEach(Customer::deletePersonalInformation);
                     return RepeatStatus.FINISHED;
                 }).build();
     }

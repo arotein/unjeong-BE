@@ -24,6 +24,7 @@ import java.util.Map;
 public class AppointmentScheduler {
     private final JobLauncher jobLauncher; // job을 실행시키기 위한 런쳐. parameter를 이용하여 각 job들을 구분함
     private final Job appointmentStateJob;
+    private final Job deletePersonalInformationJob;
 
     @Scheduled(cron = "0 1 0 * * *") // 매일 0시 1분에 실행
     public void appointmentStateJob() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
@@ -31,5 +32,13 @@ public class AppointmentScheduler {
         String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
         jobParameterMap.put("jobDateTime", new JobParameter(dateTime));
         jobLauncher.run(appointmentStateJob, new JobParameters(jobParameterMap));
+    }
+
+    @Scheduled(cron = "0 2 0 * * *") // 매일 0시 2분에 실행
+    public void deletePersonalInformationJob() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+        Map<String, JobParameter> jobParameterMap = new HashMap<>();
+        String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss"));
+        jobParameterMap.put("jobDateTime", new JobParameter(dateTime));
+        jobLauncher.run(deletePersonalInformationJob, new JobParameters(jobParameterMap));
     }
 }
