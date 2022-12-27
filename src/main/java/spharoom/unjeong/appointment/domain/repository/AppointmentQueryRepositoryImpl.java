@@ -63,6 +63,7 @@ public class AppointmentQueryRepositoryImpl extends QuerydslSupport implements A
                 .where(notDeleted(),
                         appointment.appointmentState.eq(AppointmentState.WAITING),
                         appointment.appointmentDate.in(subQuery))
+                .orderBy(appointment.appointmentDate.asc(), appointment.appointmentTime.asc())
                 .fetch();
     }
 

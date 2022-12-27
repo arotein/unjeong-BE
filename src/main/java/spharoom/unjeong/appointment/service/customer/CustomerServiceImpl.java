@@ -43,7 +43,8 @@ public class CustomerServiceImpl implements CustomerService { // 100~
             throw new CommonException(108, "선택한 날에 예약할 수 없습니다.", HttpStatus.BAD_REQUEST);
         }
         // 1. 첫 예약자의 경우 Customer 객체 생성
-        Customer customer = customerRepository.findByNameAndPhone(dto.getName(), dto.getPhone()).orElseGet(() -> dto.toCustomerEntity());
+        Customer customer = customerRepository.findByNameAndPhone(dto.getName(), dto.getPhone()).orElseGet(() -> dto.toCustomerEntity())
+                .updateLastAppointmentRequestDateTime();
         // 2. 요청자가 해당 날짜에 예약한게 있는지 확인 (예약자는 날짜별로 한 번의 예약만 가능) - 날짜 검증
         Appointment myAppointment = appointmentRepository.findLastAppointmentWithCustomer(customer.getName(), customer.getPhone(), dto.getAppointmentDate());
         if (myAppointment != null) {
@@ -85,7 +86,7 @@ public class CustomerServiceImpl implements CustomerService { // 100~
 
         Appointment appointment = appointmentRepository.findByAppointmentCodeAndIsDeletedFalse(appointmentCode)
                 .orElseThrow(() -> new CommonException(103, "예약을 찾을 수 없습니다.", HttpStatus.BAD_REQUEST));
-        Customer customer = appointment.getCustomer();
+        Customer customer = appointment.getCustomer().updateLastAppointmentRequestDateTime();
 
         // 1. 예약날짜가 변경될 경우 -> 날짜 검증
         if (dto.getAlterDate() != null) {
@@ -108,8 +109,8 @@ public class CustomerServiceImpl implements CustomerService { // 100~
 
         // 3. 2번 동시성이슈 처리 (추후 구현)
         // 4. 기존 예약 삭제 후 새 예약 생성
-        Appointment copiedAppointment = appointment.copyAndAlterAppointment(dto, customer);
-        return appointmentSafeSave(copiedAppointment.regenerateAppointmentCode()).getAppointmentCode();
+        Appointment copiedAppointment = appointment.copyAndAlterAppointment(dto);
+        return appointmentSafeSave(copiedAppointment).getAppointmentCode();
     }
 
     @Override

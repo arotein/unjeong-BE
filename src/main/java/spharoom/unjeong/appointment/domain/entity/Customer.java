@@ -6,6 +6,7 @@ import org.hibernate.annotations.Comment;
 import spharoom.unjeong.global.common.BaseEntity;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,10 @@ public class Customer extends BaseEntity { // 300~
     @Comment("연락처")
     @Column(nullable = false)
     private String phone;
+    @Comment("마지막예약요청시간")
+    @Column(nullable = false)
+    @Builder.Default
+    private LocalDateTime lastAppointmentRequestDateTime = LocalDateTime.now();
     @JsonIgnore
     @Builder.Default
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -32,5 +37,15 @@ public class Customer extends BaseEntity { // 300~
 
     public void linkToAppointment(Appointment appointment) {
         appointmentList.add(appointment);
+    }
+
+    public Customer updateLastAppointmentRequestDateTime() {
+        this.lastAppointmentRequestDateTime = LocalDateTime.now();
+        return this;
+    }
+
+    public void deletePersonalInformation() {
+        this.name = name.replaceAll("(?=^.).*", "*");
+        this.phone = phone.replaceAll("\\d*(?=-.{4}$)", "*");
     }
 }

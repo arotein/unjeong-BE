@@ -9,7 +9,10 @@ import spharoom.unjeong.appointment.domain.repository.AppointmentRepository;
 import spharoom.unjeong.appointment.domain.repository.VacationRepository;
 import spharoom.unjeong.appointment.dto.request.AppointmentQueryCondition;
 import spharoom.unjeong.appointment.dto.request.VacationReqDto;
-import spharoom.unjeong.appointment.dto.response.*;
+import spharoom.unjeong.appointment.dto.response.AppointmentQueryResDto;
+import spharoom.unjeong.appointment.dto.response.AppointmentQueryResPreDto;
+import spharoom.unjeong.appointment.dto.response.RequiredContactCustomerResDto;
+import spharoom.unjeong.appointment.dto.response.VacationResDto;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -71,27 +74,24 @@ public class AdminServiceImpl implements AdminService {
     @Transactional(readOnly = true)
     @Override
     public List<RequiredContactCustomerResDto> findRequiredContactCustomer() { // 날짜가 아니라 customer기준으로 묶자
-        Map<CustomerMinDateDto, List<RequiredContactCustomerResPreDto>> preDtoMap = new TreeMap<>(Comparator.comparing(CustomerMinDateDto::getMinDateTime));
+        List<RequiredContactCustomerResDto> dtoList = new ArrayList<>();
 
         appointmentRepository.findAllRequiredContactCustomer()
                 .forEach(appointment -> {
-                    CustomerMinDateDto customerDto = new CustomerMinDateDto(appointment);
-                    if (!preDtoMap.containsKey(customerDto)) {
-                        List<RequiredContactCustomerResPreDto> preDtoList = new ArrayList<>();
-                        preDtoList.add(RequiredContactCustomerResPreDto.of(appointment));
-                        preDtoMap.put(customerDto, preDtoList);
-                    } else {
-                        preDtoMap.get(customerDto).add(RequiredContactCustomerResPreDto.of(appointment));
+                    int addCount = 0;
+                    for (RequiredContactCustomerResDto dto : dtoList) {
+                        if (dto.samePeopleCheck(appointment.getCustomer())) {
+                            dto.addToAppointmentList(appointment);
+                            addCount++;
+                            break;
+                        }
+                    }
+                    if (addCount == 0) {
+                        dtoList.add(new RequiredContactCustomerResDto(appointment));
                     }
                 });
 
-        List<RequiredContactCustomerResDto> dtoList = new ArrayList<>();
-
-        Iterator<CustomerMinDateDto> iterator = preDtoMap.keySet().iterator();
-        while (iterator.hasNext()) {
-            CustomerMinDateDto customerDto = iterator.next();
-            dtoList.add(new RequiredContactCustomerResDto(customerDto.getCustomer(), preDtoMap.get(customerDto)));
-        }
+        dtoList.forEach(RequiredContactCustomerResDto::addIndex);
         return dtoList;
     }
 }

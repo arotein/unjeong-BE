@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import spharoom.unjeong.appointment.domain.entity.Appointment;
 import spharoom.unjeong.appointment.domain.entity.Customer;
+import spharoom.unjeong.appointment.domain.entity.PrivacyPolicy;
 import spharoom.unjeong.global.common.CommonException;
 import spharoom.unjeong.global.enumeration.AppointmentType;
 
@@ -34,18 +35,34 @@ public class RequestAppointmentReqDto {
     private LocalDate appointmentDate;
     @NotNull
     private Integer appointmentHour;
+    @NotNull
+    private Boolean personalInformationCollectionAndUsageAgreement;
+    @NotNull
+    private Boolean privacyPolicyRead;
 
     public Appointment toAppointmentEntity(Customer customer) {
         if (customer == null) {
             throw new CommonException(14, "Customer는 필수값입니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        if (personalInformationCollectionAndUsageAgreement == false) {
+            throw new CommonException(17, "개인정보 수집 및 이용 동의는 필수입니다.", HttpStatus.BAD_REQUEST);
+        }
+        if (privacyPolicyRead == false) {
+            throw new CommonException(18, "개인정보 처리 방침을 읽어야합니다.", HttpStatus.BAD_REQUEST);
+        }
+        PrivacyPolicy privacyPolicy = PrivacyPolicy.builder()
+                .personalInformationCollectionAndUsageAgreement(personalInformationCollectionAndUsageAgreement)
+                .privacyPolicyRead(privacyPolicyRead)
+                .build();
+
         return Appointment.builder()
                 .appointmentType(appointmentType)
                 .numberOfPeople(numberOfPeople)
                 .appointmentDate(appointmentDate)
                 .appointmentTime(LocalTime.of(appointmentHour, 0))
                 .build()
-                .mainLinkToCustomer(customer);
+                .mainLinkToCustomer(customer)
+                .mainLinkToPrivacyPolicy(privacyPolicy);
     }
 
     public Customer toCustomerEntity() {

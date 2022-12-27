@@ -1,5 +1,6 @@
 package spharoom.unjeong.appointment.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,11 @@ public class Appointment extends BaseEntity { // 200 ~
     @JoinColumn(name = "appointment_management_id")
     private AppointmentManagement appointmentManagement;
 
+    @JsonIgnore
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "privacy_policy_id", nullable = false, updatable = false)
+    private PrivacyPolicy privacyPolicy;
+
     public Appointment toStateDone() {
         if (appointmentState != AppointmentState.WAITING) {
             throw new CommonException(200, "완료될 수 없는 예약입니다.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -102,7 +108,18 @@ public class Appointment extends BaseEntity { // 200 ~
         return this;
     }
 
-    public Appointment copyAndAlterAppointment(AlterAppointmentReqDto dto, Customer customer) {
+    public Appointment mainLinkToPrivacyPolicy(PrivacyPolicy privacyPolicy) {
+        this.privacyPolicy = privacyPolicy;
+        privacyPolicy.linkToAppointment(this);
+        return this;
+    }
+
+    public Appointment copyAndAlterAppointment(AlterAppointmentReqDto dto) {
+        PrivacyPolicy copiedPrivacyPolicy = PrivacyPolicy.builder()
+                .personalInformationCollectionAndUsageAgreement(privacyPolicy.getPersonalInformationCollectionAndUsageAgreement())
+                .privacyPolicyRead(privacyPolicy.getPrivacyPolicyRead())
+                .build();
+
         Appointment copiedAppointment = Appointment.builder()
                 .appointmentType(dto.getAlterAppointmentType() != null ? dto.getAlterAppointmentType() : appointmentType)
                 .appointmentState(appointmentState)
@@ -111,7 +128,8 @@ public class Appointment extends BaseEntity { // 200 ~
                 .appointmentTime(dto.getAlterTime() != null ? dto.getAlterTime() : appointmentTime)
                 .requestDateTime(requestDateTime)
                 .build()
-                .mainLinkToCustomer(customer);
+                .mainLinkToCustomer(customer)
+                .mainLinkToPrivacyPolicy(copiedPrivacyPolicy);
         toStateAltered(); // 기존 객체 상태변경
         return copiedAppointment; // 새 객체 리턴
     }
