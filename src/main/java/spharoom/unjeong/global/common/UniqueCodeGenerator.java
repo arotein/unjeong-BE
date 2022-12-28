@@ -7,8 +7,8 @@ import java.time.format.DateTimeFormatter;
 
 public class UniqueCodeGenerator {
     public static String generateCode() {
-        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        String randomStr = RandomStringUtils.randomAlphanumeric(3);
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+        String randomStr = RandomStringUtils.randomAlphanumeric(4);
         return String.format("%s-%s", time, randomStr);
     }
 }
