@@ -7,7 +7,9 @@ import spharoom.unjeong.global.enumeration.AppointmentState;
 import spharoom.unjeong.global.enumeration.AppointmentType;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -23,6 +25,7 @@ public class AppointmentForAdminDto {
     private Integer numberOfPeople;
     private LocalDate appointmentDate;
     private LocalTime appointmentTime;
+    private LocalDateTime requestDateTime;
 
     public static AppointmentForAdminDto of(Appointment appointment) {
         Customer customer = appointment.getCustomer();
@@ -34,6 +37,7 @@ public class AppointmentForAdminDto {
                 .numberOfPeople(appointment.getNumberOfPeople())
                 .appointmentDate(appointment.getAppointmentDate())
                 .appointmentTime(appointment.getAppointmentTime())
+                .requestDateTime(appointment.getRequestDateTime())
                 .build();
     }
 
@@ -43,5 +47,9 @@ public class AppointmentForAdminDto {
 
     public String getAppointmentState() {
         return appointmentState.getDescription();
+    }
+
+    public String getRequestDateTime() {
+        return requestDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 }
