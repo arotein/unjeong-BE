@@ -8,11 +8,9 @@ import spharoom.unjeong.appointment.domain.entity.Vacation;
 import spharoom.unjeong.appointment.domain.repository.AppointmentRepository;
 import spharoom.unjeong.appointment.domain.repository.VacationRepository;
 import spharoom.unjeong.appointment.dto.request.AppointmentQueryCondition;
+import spharoom.unjeong.appointment.dto.request.TodayAppointmentByTypeCondition;
 import spharoom.unjeong.appointment.dto.request.VacationReqDto;
-import spharoom.unjeong.appointment.dto.response.AppointmentQueryResDto;
-import spharoom.unjeong.appointment.dto.response.AppointmentQueryResPreDto;
-import spharoom.unjeong.appointment.dto.response.RequiredContactCustomerResDto;
-import spharoom.unjeong.appointment.dto.response.VacationResDto;
+import spharoom.unjeong.appointment.dto.response.*;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -28,7 +26,7 @@ public class AdminServiceImpl implements AdminService {
     public List<VacationResDto> findVacation() {
         LocalDate nowDate = LocalDate.now();
         return vacationRepository.findAllByVacationDateIsGreaterThanEqualOrderByVacationDateAsc(nowDate)
-                .stream().map(vacation -> VacationResDto.of(vacation)).toList();
+                .stream().map(VacationResDto::of).toList();
     }
 
     @Override
@@ -50,24 +48,21 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<AppointmentQueryResDto> findAllCustomerAppointment(AppointmentQueryCondition queryCondition) {
         List<AppointmentQueryResDto> dtoList = new ArrayList<>();
-        Map<LocalDate, List<AppointmentQueryResPreDto>> preDtoMap = new TreeMap<>();
+        Map<LocalDate, List<AppointmentForAdminDto>> preDtoMap = new TreeMap<>();
 
         List<Appointment> appointmentList = appointmentRepository.findAllAppointmentTwoWeeks(queryCondition);
         appointmentList.forEach(appointment -> {
             if (!preDtoMap.containsKey(appointment.getAppointmentDate())) {
-                List<AppointmentQueryResPreDto> preDtoList = new ArrayList<>();
-                preDtoList.add(AppointmentQueryResPreDto.of(appointment));
+                List<AppointmentForAdminDto> preDtoList = new ArrayList<>();
+                preDtoList.add(AppointmentForAdminDto.of(appointment));
                 preDtoMap.put(appointment.getAppointmentDate(), preDtoList);
             } else {
-                preDtoMap.get(appointment.getAppointmentDate()).add(AppointmentQueryResPreDto.of(appointment));
+                preDtoMap.get(appointment.getAppointmentDate()).add(AppointmentForAdminDto.of(appointment));
             }
         });
 
-        Iterator<LocalDate> iterator = preDtoMap.keySet().iterator();
-        while (iterator.hasNext()) {
-            LocalDate date = iterator.next();
-            dtoList.add(new AppointmentQueryResDto(date, preDtoMap.get(date)));
-        }
+        for (LocalDate date : preDtoMap.keySet()) dtoList.add(new AppointmentQueryResDto(date, preDtoMap.get(date)));
+
         return dtoList;
     }
 
@@ -93,5 +88,15 @@ public class AdminServiceImpl implements AdminService {
 
         dtoList.forEach(RequiredContactCustomerResDto::addIndex);
         return dtoList;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public TodayAppointmentByTypeDto findTodayAppointmentByType(TodayAppointmentByTypeCondition condition) {
+        List<AppointmentForAdminDto> innerDtoList = appointmentRepository.findAllByAppointmentDateAndIsDeletedFalse(LocalDate.now()).stream()
+                .filter(appointment -> appointment.getAppointmentType() == condition.getAppointmentType())
+                .map(AppointmentForAdminDto::of)
+                .toList();
+        return new TodayAppointmentByTypeDto(condition.getAppointmentType(), innerDtoList);
     }
 }

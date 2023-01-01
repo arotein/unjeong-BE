@@ -15,9 +15,9 @@ import java.util.List;
 public class AppointmentQueryResDto {
     private Integer index;
     private LocalDate date;
-    private List<AppointmentQueryResPreDto> customerList;
+    private List<AppointmentForAdminDto> customerList;
 
-    public AppointmentQueryResDto(LocalDate date, List<AppointmentQueryResPreDto> customerList) {
+    public AppointmentQueryResDto(LocalDate date, List<AppointmentForAdminDto> customerList) {
         customerList.forEach(preDto -> preDto.setIndex(customerList.indexOf(preDto)));
         this.date = date;
         this.customerList = customerList;

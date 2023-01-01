@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import spharoom.unjeong.appointment.dto.request.AppointmentQueryCondition;
+import spharoom.unjeong.appointment.dto.request.TodayAppointmentByTypeCondition;
 import spharoom.unjeong.appointment.dto.request.VacationReqDto;
 import spharoom.unjeong.appointment.dto.response.AppointmentQueryResDto;
 import spharoom.unjeong.appointment.dto.response.RequiredContactCustomerResDto;
@@ -43,6 +44,7 @@ public class AdminController {
                 .build();
     }
 
+    // 2주치 예약 목록 조회
     @GetMapping("/appointment/list")
     public CommonResponse findAllCustomerAppointment(@Validated AppointmentQueryCondition queryCondition) {
         List<AppointmentQueryResDto> dtoList = adminService.findAllCustomerAppointment(queryCondition);
@@ -52,6 +54,7 @@ public class AdminController {
                 .build();
     }
 
+    // 연락해야 될 사용자 조회 ... 예약과 휴가가 겹칠 때
     @GetMapping("/appointment/required-contact")
     public CommonResponse findRequiredContactCustomer() {
         List<RequiredContactCustomerResDto> dtoList = adminService.findRequiredContactCustomer();
@@ -61,4 +64,12 @@ public class AdminController {
                 .build();
     }
 
+
+    // 오늘의 전화상담 예약자 조회 ... CALL, VISIT
+    @GetMapping("/appointment/today")
+    public CommonResponse findTodayAppointmentByType(@Validated TodayAppointmentByTypeCondition condition) {
+        return CommonResponse.builder()
+                .data(adminService.findTodayAppointmentByType(condition))
+                .build();
+    }
 }

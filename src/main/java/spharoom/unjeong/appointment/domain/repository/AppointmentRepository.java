@@ -11,6 +11,4 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
     Optional<Appointment> findByAppointmentCodeAndIsDeletedFalse(String appointmentCode);
 
     List<Appointment> findAllByAppointmentDateAndIsDeletedFalse(LocalDate appointmentDate);
-
-    Boolean existsByCustomer_IdAndAppointmentDateAndIsDeletedFalse(Long customerId, LocalDate date);
 }

@@ -14,7 +14,7 @@ import java.time.LocalTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppointmentQueryResPreDto {
+public class AppointmentForAdminDto {
     private Integer index;
     private String name;
     private String phone;
@@ -24,9 +24,9 @@ public class AppointmentQueryResPreDto {
     private LocalDate appointmentDate;
     private LocalTime appointmentTime;
 
-    public static AppointmentQueryResPreDto of(Appointment appointment) {
+    public static AppointmentForAdminDto of(Appointment appointment) {
         Customer customer = appointment.getCustomer();
-        return AppointmentQueryResPreDto.builder()
+        return AppointmentForAdminDto.builder()
                 .name(customer.getName())
                 .phone(customer.getPhone())
                 .appointmentType(appointment.getAppointmentType())

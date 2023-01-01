@@ -1,9 +1,11 @@
 package spharoom.unjeong.appointment.service.admin;
 
 import spharoom.unjeong.appointment.dto.request.AppointmentQueryCondition;
+import spharoom.unjeong.appointment.dto.request.TodayAppointmentByTypeCondition;
 import spharoom.unjeong.appointment.dto.request.VacationReqDto;
 import spharoom.unjeong.appointment.dto.response.AppointmentQueryResDto;
 import spharoom.unjeong.appointment.dto.response.RequiredContactCustomerResDto;
+import spharoom.unjeong.appointment.dto.response.TodayAppointmentByTypeDto;
 import spharoom.unjeong.appointment.dto.response.VacationResDto;
 
 import java.time.LocalDate;
@@ -19,4 +21,6 @@ public interface AdminService {
     List<AppointmentQueryResDto> findAllCustomerAppointment(AppointmentQueryCondition queryCondition);
 
     List<RequiredContactCustomerResDto> findRequiredContactCustomer();
+
+    TodayAppointmentByTypeDto findTodayAppointmentByType(TodayAppointmentByTypeCondition condition);
 }
