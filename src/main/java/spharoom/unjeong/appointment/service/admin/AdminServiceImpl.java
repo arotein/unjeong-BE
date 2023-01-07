@@ -1,16 +1,19 @@
 package spharoom.unjeong.appointment.service.admin;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import spharoom.unjeong.appointment.domain.entity.Appointment;
 import spharoom.unjeong.appointment.domain.entity.Vacation;
+import spharoom.unjeong.appointment.domain.repository.AdminRepository;
 import spharoom.unjeong.appointment.domain.repository.AppointmentRepository;
 import spharoom.unjeong.appointment.domain.repository.VacationRepository;
 import spharoom.unjeong.appointment.dto.request.AppointmentQueryCondition;
 import spharoom.unjeong.appointment.dto.request.TodayAppointmentByTypeCondition;
 import spharoom.unjeong.appointment.dto.request.VacationReqDto;
 import spharoom.unjeong.appointment.dto.response.*;
+import spharoom.unjeong.global.common.SecurityCommonException;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -19,6 +22,7 @@ import java.util.*;
 @Transactional
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
+    private final AdminRepository adminRepository;
     private final AppointmentRepository appointmentRepository;
     private final VacationRepository vacationRepository;
 
@@ -98,5 +102,12 @@ public class AdminServiceImpl implements AdminService {
                 .map(AppointmentForAdminDto::of)
                 .toList();
         return new TodayAppointmentByTypeDto(condition.getAppointmentType(), innerDtoList);
+    }
+
+    @Override
+    public void updateLoginDateTime(Long adminId) {
+        adminRepository.findById(adminId)
+                .orElseThrow(() -> new SecurityCommonException(500, "아이디가 존재하지 않습니다.", HttpStatus.INTERNAL_SERVER_ERROR))
+                .updateLoginDateTime();
     }
 }

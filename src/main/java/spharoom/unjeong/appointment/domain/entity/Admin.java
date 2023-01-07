@@ -27,6 +27,9 @@ public class Admin extends BaseEntity {
     private String password;
 
     @Comment("마지막접속일")
-    @Column(nullable = false, updatable = false)
     private LocalDateTime lastLoginDateTime;
+
+    public void updateLoginDateTime() {
+        this.lastLoginDateTime = LocalDateTime.now();
+    }
 }

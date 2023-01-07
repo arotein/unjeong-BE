@@ -41,15 +41,8 @@ public class RequestAppointmentReqDto {
     private Boolean privacyPolicyRead;
 
     public Appointment toAppointmentEntity(Customer customer) {
-        if (customer == null) {
-            throw new CommonException(14, "Customer는 필수값입니다.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        if (personalInformationCollectionAndUsageAgreement == false) {
-            throw new CommonException(17, "개인정보 수집 및 이용 동의는 필수입니다.", HttpStatus.BAD_REQUEST);
-        }
-        if (privacyPolicyRead == false) {
-            throw new CommonException(18, "개인정보 처리 방침을 읽어야합니다.", HttpStatus.BAD_REQUEST);
-        }
+        if (customer == null) throw new CommonException(14, "Customer는 필수값입니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+
         PrivacyPolicy privacyPolicy = PrivacyPolicy.builder()
                 .personalInformationCollectionAndUsageAgreement(personalInformationCollectionAndUsageAgreement)
                 .privacyPolicyRead(privacyPolicyRead)
@@ -107,6 +100,13 @@ public class RequestAppointmentReqDto {
         }
         if (appointmentDate.isEqual(nowDate) && appointmentHour == nowTime.getHour()) {
             throw new CommonException(13, String.format("%d시 이후 시간만 예약 가능합니다.", nowTime.getHour() + 1));
+        }
+
+        if (personalInformationCollectionAndUsageAgreement == false) {
+            throw new CommonException(17, "개인정보 수집 및 이용 동의는 필수입니다.", HttpStatus.BAD_REQUEST);
+        }
+        if (privacyPolicyRead == false) {
+            throw new CommonException(18, "개인정보 처리 방침을 읽어야합니다.", HttpStatus.BAD_REQUEST);
         }
         return this;
     }

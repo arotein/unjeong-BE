@@ -9,13 +9,20 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.filter.CorsFilter;
+import spharoom.unjeong.appointment.domain.repository.AdminRepository;
+import spharoom.unjeong.global.security.handler.JwtAuthenticationFailureHandler;
+import spharoom.unjeong.global.security.handler.JwtAuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private final String LOGIN_PROCESSING_URL = "/api/login";
+    private final JwtAuthenticationSuccessHandler jwtAuthenticationSuccessHandler;
+    private final JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler;
     private final CorsFilter corsFilter;
+    private final AdminRepository adminRepository;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -30,10 +37,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeRequests()
-//                .antMatchers("/api/admin").authenticated()
+//                .antMatchers("/api/admin/**").authenticated()
                 .antMatchers("/api/login").permitAll()
                 .antMatchers("/api/customer/**").permitAll();
 
         http.addFilterBefore(corsFilter, SecurityContextPersistenceFilter.class);
+
+        // request
+//        http.addFilterAfter(new JwtRequestProcessingFilter("/api/admin/*"), SecurityContextPersistenceFilter.class);
+
+        // login
+        applyJwtConfigurer(http);
+    }
+
+    private void applyJwtConfigurer(HttpSecurity http) throws Exception {
+        http.apply(new JwtLoginConfigurer<>(LOGIN_PROCESSING_URL))
+                .loginSuccessHandler(jwtAuthenticationSuccessHandler)
+                .loginFailureHandler(jwtAuthenticationFailureHandler)
+                .adminRepository(adminRepository);
     }
 }

@@ -23,4 +23,6 @@ public interface AdminService {
     List<RequiredContactCustomerResDto> findRequiredContactCustomer();
 
     TodayAppointmentByTypeDto findTodayAppointmentByType(TodayAppointmentByTypeCondition condition);
+
+    void updateLoginDateTime(Long adminId);
 }
