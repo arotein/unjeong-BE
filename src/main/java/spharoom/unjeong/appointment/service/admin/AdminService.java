@@ -7,6 +7,7 @@ import spharoom.unjeong.appointment.dto.response.AppointmentQueryResDto;
 import spharoom.unjeong.appointment.dto.response.RequiredContactCustomerResDto;
 import spharoom.unjeong.appointment.dto.response.TodayAppointmentByTypeDto;
 import spharoom.unjeong.appointment.dto.response.VacationResDto;
+import spharoom.unjeong.global.enumeration.AccessResult;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,4 +26,6 @@ public interface AdminService {
     TodayAppointmentByTypeDto findTodayAppointmentByType(TodayAppointmentByTypeCondition condition);
 
     void updateLoginDateTime(Long adminId);
+
+    void registerLoginLog(String ipAddress, AccessResult accessResult);
 }

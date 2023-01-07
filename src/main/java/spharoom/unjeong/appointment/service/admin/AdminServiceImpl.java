@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import spharoom.unjeong.appointment.domain.entity.AccessAttemptLog;
 import spharoom.unjeong.appointment.domain.entity.Appointment;
 import spharoom.unjeong.appointment.domain.entity.Vacation;
+import spharoom.unjeong.appointment.domain.repository.AccessAttemptLogRepository;
 import spharoom.unjeong.appointment.domain.repository.AdminRepository;
 import spharoom.unjeong.appointment.domain.repository.AppointmentRepository;
 import spharoom.unjeong.appointment.domain.repository.VacationRepository;
@@ -14,6 +16,7 @@ import spharoom.unjeong.appointment.dto.request.TodayAppointmentByTypeCondition;
 import spharoom.unjeong.appointment.dto.request.VacationReqDto;
 import spharoom.unjeong.appointment.dto.response.*;
 import spharoom.unjeong.global.common.SecurityCommonException;
+import spharoom.unjeong.global.enumeration.AccessResult;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -23,6 +26,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
     private final AdminRepository adminRepository;
+    private final AccessAttemptLogRepository accessAttemptLogRepository;
     private final AppointmentRepository appointmentRepository;
     private final VacationRepository vacationRepository;
 
@@ -109,5 +113,13 @@ public class AdminServiceImpl implements AdminService {
         adminRepository.findById(adminId)
                 .orElseThrow(() -> new SecurityCommonException(500, "아이디가 존재하지 않습니다.", HttpStatus.INTERNAL_SERVER_ERROR))
                 .updateLoginDateTime();
+    }
+
+    @Override
+    public void registerLoginLog(String ipAddress, AccessResult accessResult) {
+        accessAttemptLogRepository.save(AccessAttemptLog.builder()
+                .ipAddress(ipAddress)
+                .accessResult(accessResult)
+                .build());
     }
 }

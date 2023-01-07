@@ -22,6 +22,9 @@ jib {
             password = System.getenv("DOCKERHUB_PW")
         }
     }
+    container {
+        jvmFlags = ["-Djava.net.preferIPv4Stack=true"]
+    }
 }
 
 group = 'spharoom'

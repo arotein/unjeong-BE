@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import spharoom.unjeong.appointment.domain.entity.Admin;
 import spharoom.unjeong.appointment.service.admin.AdminService;
 import spharoom.unjeong.global.common.CommonResponse;
+import spharoom.unjeong.global.common.Utils;
+import spharoom.unjeong.global.enumeration.AccessResult;
 import spharoom.unjeong.global.security.token.UnjeongToken;
 
 import javax.servlet.ServletException;
@@ -34,5 +36,7 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
         // 로그인 시간 갱신
         Admin admin = (Admin) token.getPrincipal();
         adminService.updateLoginDateTime(admin.getId());
+
+        adminService.registerLoginLog(Utils.IpAddressExtractor(request), AccessResult.CONFIRMED);
     }
 }

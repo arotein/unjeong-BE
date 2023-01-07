@@ -20,7 +20,8 @@ public class AccessAttemptLog {
 
     @Comment("접근시도시간")
     @Column(nullable = false, updatable = false)
-    private LocalDateTime attemptDateTime;
+    @Builder.Default
+    private LocalDateTime attemptDateTime = LocalDateTime.now();
 
     @Comment("요청IP주소")
     @Column(nullable = false, updatable = false)
