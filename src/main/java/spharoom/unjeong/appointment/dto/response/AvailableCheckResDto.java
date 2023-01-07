@@ -1,12 +1,13 @@
 package spharoom.unjeong.appointment.dto.response;
 
-import lombok.*;
-
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
 public class AvailableCheckResDto {
-    private List<Integer> availableTime;
+    private Integer time; // 시간
+    private Boolean isAvailable; // 예약가능 여부
 }

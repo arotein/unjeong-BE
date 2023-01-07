@@ -123,27 +123,32 @@ public class CustomerServiceImpl implements CustomerService { // 100~
 
     @Transactional(readOnly = true)
     @Override
-    public AvailableCheckResDto availableTimeCheck(AvailableCheckCondition condition) {
+    public List<AvailableCheckResDto> availableTimeCheck(AvailableCheckCondition condition) {
+        List<AvailableCheckResDto> dtoList = generateAvailableTimeList();
         // 0. 예약가능 날짜인지 체크
         boolean exist = vacationRepository.existsByVacationDate(condition.getDate());
         if (exist) {
-            return new AvailableCheckResDto(new ArrayList<>());
+            dtoList.forEach(dto -> dto.setIsAvailable(false));
+            return dtoList;
         }
+
         List<Appointment> appointmentList = appointmentRepository.findAllByAppointmentDateAndIsDeletedFalse(condition.getDate());
-        Map<Integer, Integer> availableTimeMap = generateAvailableTimeMap();
         appointmentList.forEach(appointment -> {
-            int hour = appointment.getAppointmentTime().getHour();
-            availableTimeMap.remove(hour);
+            dtoList.forEach(dto -> {
+                if (Objects.equals(dto.getTime(), appointment.getAppointmentTime().getHour())) {
+                    dto.setIsAvailable(false);
+                }
+            });
         });
-        return new AvailableCheckResDto(availableTimeMap.values().stream().toList());
+        return dtoList;
     }
 
-    private Map<Integer, Integer> generateAvailableTimeMap() {
-        Map<Integer, Integer> timeMap = new TreeMap<>();
+    private List<AvailableCheckResDto> generateAvailableTimeList() {
+        List<AvailableCheckResDto> availableDtoList = new ArrayList<>();
         for (int k = 11; k <= 19; k++) {
-            timeMap.put(k, k);
+            availableDtoList.add(new AvailableCheckResDto(k, true));
         }
-        return timeMap;
+        return availableDtoList;
     }
 
     @Transactional(propagation = Propagation.MANDATORY)

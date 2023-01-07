@@ -1,6 +1,14 @@
 package spharoom.unjeong.global.security.token;
 
-//public class JwtAuthenticationToken extends AbstractAuthenticationToken {
+public class JwtHandler {
+
+    public void test() {
+//        JwtAuthenticationToken jwtAuthenticationToken = new JwtAuthenticationToken();
+//        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+//        AbstractAuthenticationToken convert = jwtAuthenticationConverter.convert("");
+    }
+
+}
 //    private final Object principal; // UserDetailsImpl객체 저장
 //    private String jwt;
 //    private Object credentials;

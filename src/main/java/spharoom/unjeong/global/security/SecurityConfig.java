@@ -30,7 +30,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeRequests()
-                .antMatchers("/api/**").permitAll();
+//                .antMatchers("/api/admin").authenticated()
+                .antMatchers("/api/login").permitAll()
+                .antMatchers("/api/customer/**").permitAll();
 
         http.addFilterBefore(corsFilter, SecurityContextPersistenceFilter.class);
     }

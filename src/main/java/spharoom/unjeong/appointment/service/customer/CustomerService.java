@@ -7,6 +7,8 @@ import spharoom.unjeong.appointment.dto.request.RequestAppointmentReqDto;
 import spharoom.unjeong.appointment.dto.response.AppointmentForCustomerResDto;
 import spharoom.unjeong.appointment.dto.response.AvailableCheckResDto;
 
+import java.util.List;
+
 public interface CustomerService {
     String requestAppointment(RequestAppointmentReqDto dto);
 
@@ -16,5 +18,5 @@ public interface CustomerService {
 
     String cancelAppointment(String appointmentCode);
 
-    AvailableCheckResDto availableTimeCheck(AvailableCheckCondition condition);
+    List<AvailableCheckResDto> availableTimeCheck(AvailableCheckCondition condition);
 }
