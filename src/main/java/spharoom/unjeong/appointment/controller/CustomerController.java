@@ -5,7 +5,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import spharoom.unjeong.appointment.dto.request.AlterAppointmentReqDto;
 import spharoom.unjeong.appointment.dto.request.AvailableCheckCondition;
-import spharoom.unjeong.appointment.dto.request.FindAppointmentCondition;
+import spharoom.unjeong.appointment.dto.request.FindAppointmentDto;
 import spharoom.unjeong.appointment.dto.request.RequestAppointmentReqDto;
 import spharoom.unjeong.appointment.service.customer.CustomerService;
 import spharoom.unjeong.global.common.CommonResponse;
@@ -27,10 +27,10 @@ public class CustomerController {
     }
 
     // (이름과 전화번호로) 예약 조회 (오늘~7일후 조회)
-    @GetMapping
-    public CommonResponse findAppointmentByNameAndPhone(@Validated FindAppointmentCondition condition) {
+    @PostMapping("/my")
+    public CommonResponse findAppointmentByNameAndPhone(@RequestBody FindAppointmentDto dto) {
         return CommonResponse.builder()
-                .data(customerService.findAllAppointmentByNameAndPhone(condition))
+                .data(customerService.findAllAppointmentByNameAndPhone(dto.validate()))
                 .build();
     }
 

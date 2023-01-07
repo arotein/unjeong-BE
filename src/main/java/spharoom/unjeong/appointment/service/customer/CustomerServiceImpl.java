@@ -15,7 +15,7 @@ import spharoom.unjeong.appointment.domain.repository.CustomerRepository;
 import spharoom.unjeong.appointment.domain.repository.VacationRepository;
 import spharoom.unjeong.appointment.dto.request.AlterAppointmentReqDto;
 import spharoom.unjeong.appointment.dto.request.AvailableCheckCondition;
-import spharoom.unjeong.appointment.dto.request.FindAppointmentCondition;
+import spharoom.unjeong.appointment.dto.request.FindAppointmentDto;
 import spharoom.unjeong.appointment.dto.request.RequestAppointmentReqDto;
 import spharoom.unjeong.appointment.dto.response.AppointmentForCustomerResDto;
 import spharoom.unjeong.appointment.dto.response.AvailableCheckResDto;
@@ -65,7 +65,7 @@ public class CustomerServiceImpl implements CustomerService { // 100~
 
     @Transactional(readOnly = true)
     @Override
-    public AppointmentForCustomerResDto findAllAppointmentByNameAndPhone(FindAppointmentCondition condition) { // 예약날이 휴가일과 겹치면 안내메세지 보여주기
+    public AppointmentForCustomerResDto findAllAppointmentByNameAndPhone(FindAppointmentDto condition) { // 예약날이 휴가일과 겹치면 안내메세지 보여주기
         Customer customer = customerRepository.findByNameAndPhone(condition.getName(), condition.getPhone())
                 .orElseThrow(() -> new CommonException(101, "예약한 이력이 없습니다.", HttpStatus.BAD_REQUEST));
         List<Appointment> appointmentList = appointmentRepository.findAllByCustomer(customer.getId());
