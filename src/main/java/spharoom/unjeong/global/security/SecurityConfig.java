@@ -39,6 +39,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
 //                .antMatchers("/api/admin/**").authenticated()
                 .antMatchers("/api/login").permitAll()
+                .antMatchers("/api/hello/**").permitAll()
+                .antMatchers("/api/static/**").permitAll()
                 .antMatchers("/api/customer/**").permitAll();
 
         http.addFilterBefore(corsFilter, SecurityContextPersistenceFilter.class);

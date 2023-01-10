@@ -40,6 +40,9 @@ global:
   api:
     customer-base-path: /api/customer
     admin-base-path: /api/admin
+    static-img-base-path: /api/static/img
+
+
 ---
 
 spring:
@@ -48,6 +51,8 @@ spring:
       on-profile: prod
   jpa:
     hibernate.ddl-auto: validate
+  file:
+    img-base-path: /data/img
 
 ---
 
@@ -61,3 +66,5 @@ spring:
         format_sql: true
         show_sql: true
     hibernate.ddl-auto: update
+  file:
+    img-base-path: ../db/img
